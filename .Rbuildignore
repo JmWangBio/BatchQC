@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.Rproj\.user$
 ^LICENSE\.md$
 ^.git
 ^README\.Rmd$
-
+^doc$
+^Meta$

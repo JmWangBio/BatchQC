@@ -41,6 +41,13 @@ setupSelections <- function() {
                 'Please select an option below',
             onInitialize =
                 I('function() { this.setValue(""); }')))
+    
+    # Transformation
+    updateSelectizeInput(session = session, inputId = "transformation_assay",
+                         choices = assayNames((reactivevalue$se)),
+                         selected = NULL,
+                         options = list(placeholder = "Please select an option below",
+                                        onInitialize = I('function() { this.setValue(""); }')))
 
     # Heatmap
     updateSelectizeInput(session = session, inputId = 'heatmap_assay_name',
@@ -181,8 +188,18 @@ observeEvent(input$exampleData, {
         reactivevalue$metadata <- as.data.frame(colData(bladder_data))
         reactivevalue$metadata[["batch"]] <- as.factor(reactivevalue$metadata[["batch"]])
         output$metadata_header <- renderDT(datatable(reactivevalue$metadata))
-
-    } #else if (input$exampleData == "TbData") {
+    } else if (input$exampleData == "methylationData") {
+      data(methylation_data)
+      reactivevalue$counts <- methylation_data
+      output$counts_header <- renderDT(datatable(reactivevalue$counts))
+      output$counts_dimensions <- renderText(paste(dim(reactivevalue$counts),
+                                                   c('observations and', 'samples')))
+      
+      data(methylation_sample_info)
+      reactivevalue$metadata <- methylation_sample_info
+      output$metadata_header <- renderDT(datatable(reactivevalue$metadata))
+    }
+  #else if (input$exampleData == "TbData") {
     #     #Add Indian Data Set
     # }
 })
@@ -209,6 +226,8 @@ observeEvent(input$submit, {
                 assayNames(se) <- "log_intensity"
             }else if (input$exampleData == "bladderData") {
                 assayNames(se) <- "log_CPM"
+            } else if (input$exampleData == "methylationData") {
+              assayNames(se) <- "beta_value"
             }
         }
 
@@ -321,8 +340,29 @@ observeEvent(input$correct, {
     }},
         error = function(error) {
             showNotification('Confounding', type = "error")
-            print(error)
         })
     setupSelections()
     showNotification('Batch Correction Completed', type = "message")
+})
+
+## Update transformed assay name
+observe({
+  req(input$transformation_method, input$transformation_assay)
+  updateTextInput(session = session, inputId = 'transformed_assay_name',
+                  'Name for the transformed Assay',
+                  value = paste(input$transformation_assay,
+                                input$transformation_method, sep = '_'))
+})
+
+## Transform a selected assay
+observeEvent(input$transform, {
+  req(input$transformation_method, input$transformation_assay,
+      input$transformed_assay_name)
+  withBusyIndicatorServer("transform", {
+    reactivevalue$se <- transform_SE(reactivevalue$se,
+                                     input$transformation_method,
+                                     input$transformation_assay,
+                                     input$transformed_assay_name)
+    setupSelections()
+  })
 })

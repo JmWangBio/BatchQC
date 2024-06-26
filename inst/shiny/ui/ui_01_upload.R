@@ -55,7 +55,7 @@ tabPanel("Upload Data",
                              selectInput("exampleData",
                                  "Example Data",
                                  choices = c("", "proteinData", "signatureData",
-                                     "bladderData", "No Selection"), #"TbData",
+                                     "bladderData", "methylationData", "No Selection"), #"TbData",
                                  selected = ""), ),
             withBusyIndicatorUI(actionButton(inputId = 'submit',
                                             label = 'Upload'))
@@ -84,7 +84,11 @@ tabPanel("Upload Data",
                             conditionalPanel(condition = "input.exampleData == 'TbData'",
                                 h5("This data set is from a TB cohort study from Pondicherry India and contains RNA-seq counts data."),
                                 h6("Reference: VanValkenburg A, et al. Malnutrition leads to increased inflammation and expression of tuberculosis risk signatures in recently exposed household contacts of pulmonary tuberculosis. Front Immunol. 2022 Sep 28;13:1011166. doi: 10.3389/fimmu.2022.1011166")
-                            )),
+                            ),
+                            conditionalPanel(condition = "input.exampleData == 'methylationData'",
+                                             h5("This data set is a simulated DNA methylation data, including the beta-values of 100 sites in 20 samples.")
+                                             )
+                            ),
                         h4(strong("Data Preview")),
                         DTOutput('counts_header'),
                         textOutput('counts_dimensions'),
@@ -122,17 +126,29 @@ tabPanel("Upload Data",
                          textInput(inputId = 'normalized_assay_name', 'Name for the normalized assay',
                                    value = ''),
                          checkboxInput('log', 'Log transform the results'),
+                         # checkboxInput('logit', 'Logit transform the results'),
                          withBusyIndicatorUI(actionButton(inputId = 'normalize',
                                                           label = 'Normalize')),
                          br()
                          ),
                 tabPanel('Batch Effect Correction',
                          h4(strong("Usage")),
-                         h5("Combat-Seq uses a negative binomial regression to model batch effects. It requires untransformed, raw count data to adjust for batch effect. Please select use this with a counts assay"),
-                         h5("Combat corrects for Batch effect using a parametric empirical Bayes framework and data should be cleaned and normalized. Therefore, please select a normalized assay to run this on."),
+                         h5(strong("Gene expression:")),
+                         h5("Combat-Seq uses a negative binomial regression to model batch effects. It requires untransformed, raw count data to adjust 
+                            for batch effect. Please select use this with a counts assay"),
+                         h5("Combat corrects for Batch effect using a parametric empirical Bayes framework and data should be cleaned and normalized. 
+                            Therefore, please select a normalized assay to run this on."),
+                         h5(strong("DNA methylation:")),
+                         h5("ComBat-met uses beta regression to model batch effects. It requires beta-values, i.e., methylation percentages as input 
+                            and returns adjusted M-values as output. Please select this with a DNA methylation assay."),
+                         h5("M-value-ComBat converts beta-values to M-values through a logit-transformation prior to batch correction using ComBat. 
+                            Similar to ComBat-met, it requires beta values as input and returns adjusted M-values as output.
+                            Please select this with a DNA methylation assay."),
+                         h5("If M-values are provided, ComBat should be used."),
                          selectizeInput('correction_method', 'Choose correction method',
                                         multiple = FALSE,
-                                        choices = c('ComBat-Seq', 'ComBat'),
+                                        choices = c('ComBat-Seq', 'ComBat', 
+                                                    'ComBat-met', 'M-value-ComBat'),
                                         selected = NULL,
                                         options = list(placeholder =
                                             'Please select an option below',
@@ -172,8 +188,37 @@ tabPanel("Upload Data",
                          textInput(inputId = 'corrected_assay_name',
                              'Name for the corrected assay'),
                          actionButton(inputId = 'correct', label = 'Correct')
-                        )
-
+                        ),
+                tabPanel('Transformation',
+                         h4(strong("Usage")),
+                         h5("For DNA methylation data, beta-values, whether adjusted or unadjusted, may need to be converted to
+                            M-values through a logit-transformation to accommodate certain types of statistical analysis."),
+                         h5("We recommend using the adjusted/unadjusted beta-values for principal component analysis (PCA)
+                            and heatmaps."),
+                         h5("We recommend using the adjusted/unadjusted M-values for variation analysis and
+                            differential expression analysis (LIMMA)."),
+                         h5("Below select the method of transformation and assay to be transformed."),
+                         selectizeInput('transformation_method',
+                                        'Choose transformation method',
+                                        multiple = FALSE,
+                                        choices = c('logit'),
+                                        selected = NULL,
+                                        options = list(placeholder =
+                                                         'Please select an option below',
+                                                       onInitialize = I(
+                                                         'function() { this.setValue(""); }'
+                                                       ))),
+                         selectizeInput('transformation_assay',
+                                        'Choose the assay on which to do transformation',
+                                        multiple = FALSE,
+                                        choices = c(''),
+                                        selected = NULL),
+                         textInput(inputId = 'transformed_assay_name', 'Name for the transformed assay',
+                                   value = ''),
+                         withBusyIndicatorUI(actionButton(inputId = 'transform',
+                                                          label = 'Transform')),
+                         br()
+                         )
                 )
             )
         )

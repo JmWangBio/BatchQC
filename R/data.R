@@ -1,5 +1,6 @@
 globalVariables(c("protein_sample_info", "protein_data", "batch_indicator",
-    "signature_data", "bladder_meta", "bladder_data"))
+    "signature_data", "bladder_meta", "bladder_data", "methylation_data",
+    "methylation_sample_info"))
 
 #' Batch and Condition indicator for protein expression data
 #'
@@ -88,3 +89,32 @@ bladder_data_upload <- function() {
 
     return(se_object)
 }
+
+#' Batch and Condition indicator for DNA methylation data
+#'
+#' This data consists of two batches and two conditions
+#' corresponding to case and control for the DNA methylation data
+#'
+#' @name methylation_sample_info
+#' @docType data
+#' @format A data frame with 20 rows and 2 variables:
+#' \describe{
+#'     \item{batch}{Batch Indicator}
+#'     \item{category}{Condition (Case vs Control) Indicator}
+#' }
+#' @keywords datasets
+#' @usage data(methylation_sample_info)
+"methylation_sample_info"
+
+#' DNA methylation data with 100 methylation levels
+#'
+#' This data consists of two batches and two conditions
+#' corresponding to case and control. The columns are case/control
+#' samples, and the rows represent 100 different sites.
+#'
+#' @name methylation_data
+#' @docType data
+#' @format A data frame with 100 rows and 20 variables
+#' @keywords datasets
+#' @usage data(methylation_data)
+"methylation_data"

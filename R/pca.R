@@ -42,7 +42,7 @@ PCA_plotter <- function(se, nfeature, color, shape,
         }else {
             # Preprocess data
             data <- preprocess(se, assay, nfeature, log_option)
-            centered <- data - rowMeans(data) / matrixStats::rowSds(data)
+            centered <- (data - rowMeans(data)) / matrixStats::rowSds(data)
             coldata <- data.frame(colData(se))
             pca <- stats::prcomp(t(centered), center = FALSE)
 
