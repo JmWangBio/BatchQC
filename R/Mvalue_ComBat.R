@@ -1,3 +1,4 @@
+# To be integrated into sva
 # Adjust for batch effects in DNA methylation data by converting beta-values to M-values followed by ComBat
 Mvalue_ComBat <- function(bv, batch, group = NULL, 
                           covar_mod = NULL, full_mod = TRUE, 

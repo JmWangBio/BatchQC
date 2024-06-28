@@ -1,8 +1,10 @@
+# No longer necessary when integrated into sva
 ####  Expand a vector into matrix (columns as the original vector)
 vec2mat <- function(vec, n_times){
   return(matrix(rep(vec, n_times), ncol=n_times, byrow=FALSE))
 }
 
+# To be integrated into sva
 #### Monte Carlo integration functions for beta distribution
 monte_carlo_int_beta <- function(dat, mu, gamma, phi, delta, feature.subset.n) {
   weights <- pos_res <- list()
@@ -59,6 +61,7 @@ monte_carlo_int_beta <- function(dat, mu, gamma, phi, delta, feature.subset.n) {
   return(res)
 } 
 
+# To be integrated into sva
 #### Match quantiles for beta distribution
 match_quantiles_beta <- function(bv_sub, old_mu, old_phi, new_mu, new_phi) {
   new_bv_sub <- matrix(NA, nrow = nrow(bv_sub), ncol = ncol(bv_sub))

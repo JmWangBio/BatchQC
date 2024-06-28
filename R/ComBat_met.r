@@ -1,3 +1,4 @@
+# To be integrated into sva
 # Adjust for batch effects using a beta regression framework in DNA methylation data
 ComBat_met <- function(bv, batch, group = NULL, covar_mod = NULL, full_mod = TRUE,
                        shrink = FALSE, mean.only = FALSE, feature.subset.n = NULL,
